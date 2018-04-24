@@ -37,7 +37,7 @@ generateEmber() {
     dirname=`cloneOrPullRepository $repo`
     echo "==== $dirname ===="
     pushd $dirname > /dev/null
-    ed npm install
+    edi "npm install" < /dev/tty
     commands=`docker run --rm -v $work_dir/$domainSource/config/resources/:/config -i command-generator | grep ember | sed -e 's/ember/edi ember/'`
     while read line;do
         $line < /dev/tty
