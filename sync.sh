@@ -37,6 +37,7 @@ generateEmber() {
     dirname=`cloneOrPullRepository $repo`
     echo "==== $dirname ===="
     pushd $dirname > /dev/null
+    ed npm install
     commands=`docker run --rm -v $work_dir/$domainSource/config/resources/:/config -i command-generator | grep ember | sed -e 's/ember/edi ember/'`
     while read line;do
         $line < /dev/tty
@@ -95,6 +96,6 @@ docker build -t command-generator . > /dev/null
 popd > /dev/null
 
 # demo editor
-generateEmber "git@github.com/lblod/frontend-editor-admin" "app-demo-editor"
+generateEmber "git@github.com:lblod/frontend-editor-admin" "app-demo-editor"
 # loket
-generateEmber "git@github.com/lblod/frontend-loket-admin" "app-digitaal-loket"
+generateEmber "git@github.com:lblod/frontend-loket-admin" "app-digitaal-loket"
