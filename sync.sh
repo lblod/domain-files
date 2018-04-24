@@ -1,6 +1,4 @@
-#!/bin/bash
-domain_dir=`pwd`
-work_dir=$1
+#!/bin/bash -i
 
 repositories=(git@github.com:lblod/app-demo-editor.git
 git@github.com:lblod/app-mandatendatabank.git
@@ -20,39 +18,83 @@ confirm() {
     esac
 }
 
-echo "will attempt to sync domain files to repositories cloned in $1"
+cloneOrPullRepository() {
+    repo=$1
+    dirname=`echo $repo | sed -r 's/(https:\/\/|git@)github.com(:|\/)[a-z]+\/([a-z-]+)(.git)?/\3/'`
+    if [ -d $dirname ];then
+        pushd $dirname > /dev/null
+        git pull > /dev/null
+        popd > /dev/null
+    else
+        git clone $repo > /dev/null
+    fi
+    echo $dirname
+}
 
+generateEmber() {
+    repo=$1
+    domainSource=$2
+    dirname=`cloneOrPullRepository $repo`
+    echo "==== $dirname ===="
+    pushd $dirname > /dev/null
+    commands=`docker run --rm -v $work_dir/$domainSource/config/resources/:/config -i command-generator | grep ember | sed -e 's/ember/edi ember/'`
+    while read line;do
+        $line < /dev/tty
+    done <<< "$commands"
+    git add .
+    git diff --cached
+    git status
+    confirm "Commit files? [y/N]" && git commit -m "syncing shared domain configuration"
+    popd > /dev/null
+}
 
-if [ ! -d $work_dir ];then
-   echo "Error: $1 is not a directory"
+if [ ! -d $1 ];then
+   echo "Error : $1 is not a directory"
    echo
    echo "Usage: "
    echo " $0 /your/work/directory"
    exit -1
 fi
 
-pushd $work_dir
-for repository in ${repositories[*]}; do
-    dirname=`echo $repository | sed -r 's/git@github.com:lblod\/([a-z-]+).git/\1/'`
+domain_dir=`pwd`
+work_dir="$( cd "$1" ; pwd -P )"
 
-    echo $dirname
-    if [ -d $dirname ];then
-        pushd $dirname
-        git pull
-        popd
-    else
-        git clone $repository;
-    fi
-    pushd $dirname
+echo "will attempt to sync domain files to repositories cloned in $work_dir"
+
+pushd $work_dir > /dev/null
+for repository in ${repositories[*]}; do
+    dirname=`cloneOrPullRepository $repository`
+    echo "==== $dirname ==="
+    pushd $dirname > /dev/null
     for domain in $domain_dir/master-*-domain.lisp; do
         basename=`basename $domain`
         filename=`echo $basename | sed -e 's/master-/slave-/'`
         cp $domain config/resources/$filename
         git add config/resources/$filename
     done
+    git diff --cached
     git status
     confirm "Commit files? [y/N]" && git commit -m "syncing shared domain configuration" &&
     confirm "Push commit? [y/N]" && git push
-    popd
+    popd > /dev/null
 done
-popd
+
+confirm "update admin applications? [y/N]" || exit 0
+echo "setting up command generator"
+dirname=`cloneOrPullRepository "https://github.com/tenforce/ember-mu-application-generator-generator"`
+echo "==== $dirname ==="
+pushd $dirname > /dev/null
+
+# fix generator
+lastline=`tail -n 1 startup.lisp`
+if [[ $lastline != "(exit)" ]];then
+    echo "(exit)" >> startup.lisp
+fi
+
+docker build -t command-generator . > /dev/null
+popd > /dev/null
+
+# demo editor
+generateEmber "git@github.com/lblod/frontend-editor-admin" "app-demo-editor"
+# loket
+generateEmber "git@github.com/lblod/frontend-loket-admin" "app-digitaal-loket"
