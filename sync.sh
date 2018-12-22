@@ -1,6 +1,6 @@
 #!/bin/bash -i
 
-repositories=(git@github.com:lblod/app-demo-editor.git
+repositories=(git@github.com:lblod/app-gelinkt-notuleren.git
 git@github.com:lblod/app-mandatendatabank.git
 git@github.com:lblod/app-digitaal-loket.git
 git@github.com:lblod/json-api-documentation.git)
