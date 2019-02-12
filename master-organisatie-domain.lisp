@@ -34,7 +34,9 @@
              (rol :via ,(s-prefix "org:role")
                   :as "rol")
              (bestuurseenheid :via ,(s-prefix "org:organization")
-                              :as "is-lidmaatschap-bij"))
+                              :as "is-lidmaatschap-bij")
+             (functionaris-status-code :via ,(s-prefix "lblod:functionarisStatusCode")
+                                       :as "status"))
 
   :resource-base (s-url "http://data.lblod.info/id/functionaris/")
   :features '(include-uri)
@@ -58,7 +60,15 @@
 (define-resource rol ()
   :class (s-prefix "org:Role")
   :properties `((:label :string ,(s-prefix "skos:prefLabel")))
-  :resource-base (s-url "http://data.lblod.info/id/concept/bestuurseenheidRollen/")
+  :resource-base (s-url "http://data.lblod.info/id/concept/functionarisRol/")
   :features '(include-uri)
   :on-path "rollen"
 )
+
+(define-resource functionaris-status-code ()
+  ;;TODO: publish this somewhere
+  :class (s-prefix "lblod:FunctionarisStatusCode")
+  :properties `((:label :string ,(s-prefix "skos:prefLabel")))
+  :resource-base (s-url "http://data.vlaanderen.be/id/concept/functionarisStatusCode/")
+  :features '(include-uri)
+  :on-path "functionaris-status-codes")
