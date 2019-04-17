@@ -99,6 +99,6 @@ docker build -t command-generator . > /dev/null
 popd > /dev/null
 
 # demo editor
-generateEmber "git@github.com:lblod/frontend-editor-admin" "app-demo-editor"
+#generateEmber "git@github.com:lblod/frontend-editor-admin" "app-demo-editor"
 # loket
-generateEmber "git@github.com:lblod/frontend-loket-admin" "app-digitaal-loket"
+#generateEmber "git@github.com:lblod/frontend-loket-admin" "app-digitaal-loket"
