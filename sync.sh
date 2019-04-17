@@ -3,7 +3,8 @@
 repositories=(git@github.com:lblod/app-gelinkt-notuleren.git
 git@github.com:lblod/app-mandatendatabank.git
 git@github.com:lblod/app-digitaal-loket.git
-git@github.com:lblod/json-api-documentation.git)
+git@github.com:lblod/json-api-documentation.git
+git@github.com:lblod/app-toezicht-abb.git)
 
 confirm() {
     # call with a prompt string or use a default
