@@ -23,6 +23,7 @@ cloneOrPullRepository() {
     dirname=`echo $repo | sed -r 's/(https:\/\/|git@)github.com(:|\/)[a-z]+\/([a-z-]+)(.git)?/\3/'`
     if [ -d $dirname ];then
         pushd $dirname > /dev/null
+        git checkout development > /dev/null
         git pull > /dev/null
         popd > /dev/null
     else
@@ -67,6 +68,7 @@ for repository in ${repositories[*]}; do
     dirname=`cloneOrPullRepository $repository`
     echo "==== $dirname ==="
     pushd $dirname > /dev/null
+    git checkout development
     for domain in $domain_dir/master-*-domain.lisp; do
         basename=`basename $domain`
         filename=`echo $basename | sed -e 's/master-/slave-/'`
